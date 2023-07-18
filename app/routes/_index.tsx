@@ -1,18 +1,6 @@
-import { json } from "@remix-run/node";
-import { useLoaderData } from "@remix-run/react";
-import { db } from "~/db.server";
+import { redirect } from "@remix-run/node";
+
 
 export async function loader() {
-  const users = await db.user.findMany()
-  return json({ users })
-}
-
-export default function () {
-  const { users } = useLoaderData<typeof loader>()
-  return (
-    <>
-      <h1>Conexão com o banco!</h1>
-      <pre>{JSON.stringify(users, null, 2)}</pre>
-    </>
-  );
+  return redirect("/users");
 }

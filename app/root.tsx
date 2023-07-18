@@ -27,6 +27,7 @@ export default function App() {
         <ScrollRestoration />
         <Scripts />
         <LiveReload />
+        <script src="https://cdn.tailwindcss.com"></script>
       </body>
     </html>
   );
