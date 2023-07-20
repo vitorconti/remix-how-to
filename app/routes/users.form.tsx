@@ -1,13 +1,12 @@
+import { formAction } from '~/form-action.server' /* path to your custom formAction */
+import { makeDomainFunction } from 'domain-functions'
+import { z } from 'zod'
 import { UserForm } from "~/components/features/users/UserForm";
-import { ActionArgs, redirect } from "@remix-run/node"
+import { ActionArgs, ActionFunction, redirect } from "@remix-run/node"
 import { db } from "~/db.server";
 import { User } from "@prisma/client";
-export async function action({ request }: ActionArgs) {
-    throw new Error('vishh')
-    const data = Object.fromEntries(await request.formData())
-    await db.user.create({ data: data as unknown as User })
-    return redirect('/users')
-}
+
+
 export function ErrorBoundary() {
     return (
         <div>
@@ -15,6 +14,28 @@ export function ErrorBoundary() {
         </div>
     );
 }
+
+
+const formSchema = z.object({
+    name: z.string().min(1, { message: 'Please provide your name' }).trim(),
+    email: z.string().min(1, { message: 'Please provide your email' }).trim(),
+    city: z.string().min(1, { message: 'Please provide your city' }).trim(),
+    state: z.string().min(1, { message: 'Please provide your state' }).trim(),
+})
+
+const mutation = makeDomainFunction(formSchema)(async (data) => (
+    await db.user.create({ data })
+))
+
+
+export const action: ActionFunction = async ({ request }) =>
+    formAction({
+        request,
+        schema: formSchema,
+        mutation,
+        successPath: '/users', /* path to redirect on success */
+    })
+
 export default function () {
-    return <UserForm />
+    return <UserForm formSchema={formSchema} />
 }
